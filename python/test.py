@@ -1,7 +1,8 @@
-text = "asd asd hamster asd hamster asd asd"
-print(text.rstrip("asd"))
-print(text.lstrip("asd"))
+import urllib.request
+import http.client
 
-text = "asd hamster asd hamster asd"
-print(text.rstrip("asd"))
-print(text.lstrip("asd"))
+http_response: http.client.HTTPResponse = urllib.request.urlopen("http://www.heise.de")
+print(http_response.read())
+
+
+
