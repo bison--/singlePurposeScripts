@@ -13,7 +13,7 @@ def snake_case(txt_ar):
 
     # C has a null-terminator that would handle this, we have to do this manually
     upper_count = 0
-    # copy array and increase size for later
+    # copy array
     for i in range(len(txt_ar)):
         if ord(txt_ar[i]) >= A_UPPER and ord(txt_ar[i]) <= Z_UPPER:
             upper_count += 1
