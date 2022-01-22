@@ -16,7 +16,9 @@ for _file_name in only_files:
     full_source_path = os.path.join(source_path, _file_name)
     full_destination_path = os.path.join(destination_path, _file_name)
     if rename_files:
-        full_destination_path = os.path.join(destination_path, "card_" + str(count) + ".png")
+        mod_file_name = _file_name.replace(' ', '_').replace('-1', '').replace('.png', '_thumbnail.png')
+        #full_destination_path = os.path.join(destination_path, "card_" + str(count) + ".png")
+        full_destination_path = os.path.join(destination_path, mod_file_name)
 
     try:
         img = Image.open(full_source_path)
