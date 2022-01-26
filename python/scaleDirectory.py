@@ -8,6 +8,8 @@ destination_path = input('enter destination path:').strip()
 width = int(input('enter max width:').strip())
 rename_files = helper.valid_input('rename files? ', bool, True, False)
 
+save_type = '.jpg'
+
 only_files = [f for f in os.listdir(source_path) if os.path.isfile(os.path.join(source_path, f))]
 
 
@@ -20,8 +22,14 @@ for _file_name in only_files:
         #full_destination_path = os.path.join(destination_path, "card_" + str(count) + ".png")
         full_destination_path = os.path.join(destination_path, mod_file_name)
 
+    if save_type != '':
+        full_destination_path = full_destination_path.replace('.png', '.jpg')
+
     try:
         img = Image.open(full_source_path)
+        if save_type == '.jpg':
+            img = img.convert('RGB')
+
         width_percent = (width / float(img.size[0]))
         height_size = int((float(img.size[1]) * float(width_percent)))
         img = img.resize((width, height_size), Image.ANTIALIAS)
