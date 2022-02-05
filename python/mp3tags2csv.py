@@ -4,10 +4,11 @@ import csv
 from time import strftime, gmtime
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
+import helper
 
 
-source_path = r""
-dest_csv = r""
+source_path = helper.valid_input('Enter path with MP3s:')
+dest_csv = helper.valid_input('Enter path and filename for target CSV (default output/track_metadata.csv):', True, 'output/track_metadata.csv')
 
 csv_handle = open(dest_csv, 'w', encoding='UTF8', newline='\n')
 csv_writer = csv.writer(csv_handle)
