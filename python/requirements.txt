@@ -5,3 +5,5 @@ py-vox-io~=0.1
 matplotlib~=3.5.1
 mutagen~=1.45.1
 ascii~=3.6
+requests~=2.31.0
+beautifulsoup4~=4.12.2
