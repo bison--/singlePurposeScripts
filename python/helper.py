@@ -1,3 +1,4 @@
+import os
 
 def bool_conversion(user_input):
     valid_true = {'true', 'True', 'y', 'yes', 'j', 'ja'}
@@ -23,3 +24,7 @@ def valid_input(question, _type=str, use_default=False, default=None):
             print(ex)
 
     return result
+
+def get_full_path_without_extension(file_path):
+    file_path_without_extension, _ = os.path.splitext(file_path)
+    return file_path_without_extension
