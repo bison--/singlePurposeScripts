@@ -37,7 +37,6 @@ def gather_image_stats(root_dir, ext):
             total_files += 1
             file_path = os.path.join(dirpath, fname)
             try:
-
                 with Image.open(file_path) as img:
                     resolution_counter[img.size] += 1
             except Exception as e:
@@ -72,14 +71,13 @@ def analyze_image_directory(directory, ext='.png'):
     """
     res_counts, sizes, total_files = gather_image_stats(directory, ext)
 
-    stats = {
+    return {
         'total_files': total_files,
         'min_size': min(sizes) if sizes else 0,
         'max_size': max(sizes) if sizes else 0,
         'total_size': sum(sizes) if sizes else 0,
         'resolution_counts': res_counts
     }
-    return stats
 
 
 def print_stats(stats):
@@ -103,23 +101,87 @@ def print_stats(stats):
         print("No resolution data available.")
 
 
+def resize_images(root_dir, ext, percentage, output_dir=None):
+    """
+    Resize images proportionally by a percentage.
+
+    Args:
+        root_dir (str): directory to search for images
+        ext (str): image file extension (e.g., '.png')
+        percentage (float): resize factor in percent (e.g., 50 for 50%)
+        output_dir (str, optional): directory to save resized images;
+            if None, original files will be overwritten.
+
+    Returns:
+        int: number of images resized
+    """
+    factor = percentage / 100.0
+    count = 0
+
+    for dirpath, _, filenames in os.walk(root_dir):
+        for fname in filenames:
+            if not fname.lower().endswith(ext.lower()):
+                continue
+            src_path = os.path.join(dirpath, fname)
+            try:
+                with Image.open(src_path) as img:
+                    new_size = (int(img.width * factor), int(img.height * factor))
+                    resized = img.resize(new_size, Image.LANCZOS)
+
+                    # Determine save path
+                    if output_dir:
+                        rel_path = os.path.relpath(dirpath, root_dir)
+                        target_dir = os.path.join(output_dir, rel_path)
+                        os.makedirs(target_dir, exist_ok=True)
+                        dest_path = os.path.join(target_dir, fname)
+                    else:
+                        dest_path = src_path
+
+                    resized.save(dest_path)
+                    count += 1
+            except Exception as e:
+                print(f"Warning: Could not resize {src_path}: {e}")
+    return count
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description="Analyze image files in a directory and report resolution and size statistics."
+        description="Analyze and optionally resize image files in a directory."
+    )
+    parser.add_argument('directory', help="Root directory to search for images")
+    parser.add_argument('--ext', default='.png', help="Image file extension (default: .png)")
+    parser.add_argument(
+        '--resize', type=float,
+        help="Resize images by percentage (e.g., 50 for 50%)"
     )
     parser.add_argument(
-        'directory', help="Root directory to search for images"
-    )
-    parser.add_argument(
-        '--ext', default='.png', help="Image file extension to look for (default: .png)"
+        '--output-dir', default=None,
+        help="Directory to save resized images (overwrites originals if omitted)"
     )
     args = parser.parse_args()
 
     stats = analyze_image_directory(args.directory, args.ext)
     print_stats(stats)
 
+    if args.resize:
+        num = resize_images(
+            args.directory, args.ext, args.resize, args.output_dir
+        )
+        print(f"\nResized {num} image(s) by {args.resize}%.")
+
 
 if __name__ == '__main__':
     #main()
-    stats = analyze_image_directory(r"K:\gamedev\godot\streamerFlowers\streameFlowers\images\flowers\moonflower_v3_parts")
+    imageDir = r"K:\gamedev\godot\streamerFlowers\streameFlowers\images\flowers\moonflower_v3_parts"
+    stats = analyze_image_directory(imageDir)
     print_stats(stats)
+    '''
+    num = resize_images(
+        imageDir,
+        ".png",
+        50
+    )
+
+    stats = analyze_image_directory(imageDir)
+    print_stats(stats)
+    '''
