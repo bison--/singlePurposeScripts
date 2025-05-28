@@ -12,11 +12,12 @@ def do_download(url, dest):
     open(dest, 'w').write(url_handle.read().decode('utf-8'))
 
 
-def get_filtered_words(words, filter):
+def get_filtered_words(words, filter_length):
     filtered = []
     for word in words:
-        if len(word.strip()) == filter:
-            filtered.append(word)
+        stripped_word = word.strip()
+        if len(stripped_word) == filter_length:
+            filtered.append(stripped_word)
 
     return filtered
 
