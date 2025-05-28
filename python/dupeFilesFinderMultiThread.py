@@ -36,7 +36,7 @@ for a_dir in conf.dir_list:
 file_counter = len(all_file_paths)
 print('files to check:', file_counter)
 
-with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+with concurrent.futures.ThreadPoolExecutor(max_workers=14) as executor:
     all_md5s = executor.map(multi_thread_md5, all_file_paths)
 
 print('start comparison')

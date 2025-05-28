@@ -9,7 +9,7 @@ def valid_input(question, _type=str, use_default=False, default=None):
     need_input = True
     result = None
     while need_input:
-        user_input = input(question)
+        user_input = input(question).strip()
         if user_input == '' and use_default:
             result = default
             break
