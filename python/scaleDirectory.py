@@ -46,7 +46,7 @@ for _file_name in only_files:
         width_size = int((float(img.size[0]) * float(width_percent)))
 
         # img = img.resize((width, height_size), Image.ANTIALIAS)
-        img = img.resize((width_size, height), Image.ANTIALIAS)
+        img = img.resize((width_size, height), Image.Resampling.LANCZOS)
 
         if save_type == '.jpg':
             img.save(full_destination_path, quality=jpeg_compression)
