@@ -3,8 +3,11 @@ import random
 import re
 import sys
 from pathlib import Path
+import requests
+import tempfile
 import zipfile
 
+import helper
 
 # possible bash alias:
 # alias run-update-godot="cd /home/YOUR_HOME/projects/github/singlePurposeScripts/python && python3 godot_zip_installer.py"
@@ -16,10 +19,62 @@ UNZIP_PATH = "~/programs"
 # the OS-folder that contains all the .dekstop files
 TARGET_APP_ICONS_FOLDER = "~/.local/share/applications"
 
+DOWNLOAD_CHUNK_SIZE = 4096
 
 def extract_version(filename: str) -> str | None:
     match = re.search(r'v?(\d+\.\d+\.\d+)', filename)
     return match.group(1) if match else None
+
+def is_valid_version(version):
+    if not version:
+        return False
+
+    parts = version.split('.')
+    for part in parts:
+        if not part.isdigit():
+            return False
+
+    return True
+
+def get_progress_bar(current, total):
+    percentage = current / total * 100
+    percentage_int = int(percentage)
+    percentage_cut_int = int(percentage / 10)
+    return "[" + ("#" * percentage_cut_int).ljust(10) + "] " + str(percentage_int) + " %"
+
+def download_version(version):
+    # https://github.com/godotengine/godot/releases/download/4.5.2-stable/Godot_v4.5.2-stable_mono_linux_x86_64.zip
+    download_url = f"https://github.com/godotengine/godot/releases/download/{version}-stable/Godot_v{version}-stable_mono_linux_x86_64.zip"
+    target_file = os.path.join(tempfile.gettempdir(), f"Godot_v{version}-stable_mono_linux_x86_64.zip")
+
+    if os.path.isfile(target_file):
+        print("version", version, "already downloaded to", target_file)
+        skip_download = helper.valid_input('skip download? ', bool, True, True)
+        if skip_download:
+            print("skipping download")
+            return target_file
+
+    response = requests.get(download_url, stream=True)
+    print("Downloading", download_url, "to", target_file)
+
+    file_size = int(response.headers['content-length'])
+    downloaded_size = 0
+    downloaded_size_shown = 0
+    with open(target_file, "wb") as targe_file_handle:
+        for data in response.iter_content(chunk_size=DOWNLOAD_CHUNK_SIZE):
+            downloaded_size += DOWNLOAD_CHUNK_SIZE
+            downloaded_size_shown += DOWNLOAD_CHUNK_SIZE
+            if downloaded_size_shown >= 1000000:
+                print(f"Downloaded {downloaded_size} / {file_size} bytes")
+                print(get_progress_bar(downloaded_size, file_size))
+                downloaded_size_shown = 0
+
+            targe_file_handle.write(data)
+
+    print()
+    print("Download complete.")
+
+    return target_file
 
 
 print('''                  
@@ -50,7 +105,19 @@ print("")
 
 print("HINT: you can drag/drop the file into the terminal")
 print("Path (inl. filename) to the ZIP file (e.g. ~/Downloads/Godot_v4.6.3-stable_mono_linux_x86_64.zip)")
-zip_file = input("Godot ZIP file: ").strip().strip("'")
+print("Version Number: enter a godot version, eg: 4.5.2")
+user_input = input("Godot ZIP file OR version number: ").strip().strip("'")
+
+zip_file = ""
+
+if is_valid_version(user_input):
+    zip_file = download_version(user_input)
+elif user_input.endswith(".zip"):
+    zip_file = user_input
+else:
+    print("Neither a zip file nor a valid version.")
+    sys.exit(1)
+
 
 if zip_file.startswith("~"):
     zip_file = os.path.expanduser(zip_file)
