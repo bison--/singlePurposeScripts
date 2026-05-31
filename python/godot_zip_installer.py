@@ -49,7 +49,7 @@ def download_version(version):
 
     if os.path.isfile(target_file):
         print("version", version, "already downloaded to", target_file)
-        skip_download = helper.valid_input('skip download? ', bool, True, True)
+        skip_download = helper.valid_input('skip download? (Y/n)', bool, True, True)
         if skip_download:
             print("skipping download")
             return target_file
