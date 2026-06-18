@@ -22,7 +22,7 @@ TARGET_APP_ICONS_FOLDER = "~/.local/share/applications"
 DOWNLOAD_CHUNK_SIZE = 4096
 
 def extract_version(filename: str) -> str | None:
-    match = re.search(r'v?(\d+\.\d+\.\d+)', filename)
+    match = re.search(r'v?(\d+\.\d+(?:\.\d+)?)', filename)
     return match.group(1) if match else None
 
 def is_valid_version(version):
@@ -133,7 +133,6 @@ TEMPLATE_ICON_PATH = os.path.expanduser(TEMPLATE_ICON_PATH)
 TEMPLATE_PATH = os.path.expanduser(os.path.join(UNZIP_PATH, program_name))
 TEMPLATE_EXEC_PATH = os.path.join(TEMPLATE_PATH, program_name.replace("_x86_64", ".x86_64"))
 TEMPLATE_VERSION = extract_version(program_name)  #4.6.0
-
 
 # https://specifications.freedesktop.org/desktop-entry/1.2/recognized-keys.html
 
